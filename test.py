@@ -1,5 +1,5 @@
 import numpy as np
-
+import struct
 def f(input:float) -> float:
     return input*2
 
@@ -29,7 +29,12 @@ if __name__ == "__main__":
     assert(curr_n == x.size * 4)
     print(x.size)
 
-    
+
+    print(16**0.5)
 
     print(0.9460833108884718 - 0.9456908635827013)
+
+    s = float(0.125)
+    s = np.float32(0.125)
+    print(struct.pack(">f",s))
 
