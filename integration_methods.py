@@ -12,6 +12,17 @@ class Integration:
     def __init__(self) -> None:
         self.verbose = False #verbose为true可在控制台显示中间的结果
 
+        #用于实现高斯-勒让德公式
+        self.x = np.array([0.00, 
+        -0.8360311073266358, 0.8360311073266358, -0.9681602395076261, 0.9681602395076261,
+        -0.3242534234038089, 0.3242534234038089, -0.6133714327005904, 0.6133714327005904],
+        dtype=np.float64)
+
+        self.A = np.array([0.3302393550012598,
+        0.1806481606948574, 0.1806481606948574, 0.0812743883615744, 0.0812743883615744,
+        0.3123470770400029, 0.3123470770400029, 0.2606106964029354, 0.2606106964029354],
+        dtype=np.float64)
+
     #################
     #高斯-切比雪夫 Ⅰ型
     #################
@@ -22,7 +33,6 @@ class Integration:
             print("选的 %i 个点为:"%n)
             print(x)
 
-        
         f_x = func(x)
         if self.verbose:
             print("选的 %i 个点对应的f为:"%n)
@@ -44,7 +54,6 @@ class Integration:
             print("选的 %i 个点为:"%n)
             print(x)
         
-        
         f_x = func(x)
         if self.verbose:
             print("选的 %i 个点对应的f为:"%n)
@@ -65,19 +74,19 @@ class Integration:
     #高斯-勒让德（gause-legendre) 9点,[-1,1]区间
     #################
     def gauss_leg_9(self, func) -> np.float64:
-        x = np.array([0.00, 
-        -0.8360311073266358, 0.8360311073266358, -0.9681602395076261, 0.9681602395076261,
-        -0.3242534234038089, 0.3242534234038089, -0.6133714327005904, 0.6133714327005904],
-        dtype=np.float64)
+        # x = np.array([0.00, 
+        # -0.8360311073266358, 0.8360311073266358, -0.9681602395076261, 0.9681602395076261,
+        # -0.3242534234038089, 0.3242534234038089, -0.6133714327005904, 0.6133714327005904],
+        # dtype=np.float64)
 
-        A = np.array([0.3302393550012598,
-        0.1806481606948574, 0.1806481606948574, 0.0812743883615744, 0.0812743883615744,
-        0.3123470770400029, 0.3123470770400029, 0.2606106964029354, 0.2606106964029354],
-        dtype=np.float64)
+        # A = np.array([0.3302393550012598,
+        # 0.1806481606948574, 0.1806481606948574, 0.0812743883615744, 0.0812743883615744,
+        # 0.3123470770400029, 0.3123470770400029, 0.2606106964029354, 0.2606106964029354],
+        # dtype=np.float64)
 
-        f_x = func(x)
+        f_x = func(self.x)
 
-        result = np.multiply(f_x, A).sum()
+        result = np.multiply(f_x, self.A).sum()
         if self.verbose:
             print("积分结果为：",result)
         return result
@@ -362,63 +371,72 @@ class normal_functions:
         return np.sin(input)
 
     #测试函数
-    def test_those_methods():
+    def test_those_methods(n_test_loops:int = 100):
         tester  = Integration()
-
         print("#########################\n计算exp(x) * sqrt(1-x^2),在[-1,1]区间上的积分\n#######################")
 
         t_begin = time.time()
-        gauss_chi_1_result = tester.gauss_ch1(normal_functions.x_mul_exp_x,5)
+        for i in range(0,n_test_loops):
+            gauss_chi_1_result = tester.gauss_ch1(normal_functions.x_mul_exp_x,5)
         t_end = time.time()
-        print("gauss_chi_1 result is ", gauss_chi_1_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("gauss_chi_1 result is ", gauss_chi_1_result, "\tspend time: ", (t_end-t_begin)*1000 /n_test_loops, "ms")
 
         t_begin = time.time()
-        gauss_chi_2_result = tester.gauss_ch2(normal_functions.exp_x,5)
+        for i in range(0,n_test_loops):
+            gauss_chi_2_result = tester.gauss_ch2(normal_functions.exp_x,5)
         t_end = time.time()
-        print("gauss_chi_2 result is ", gauss_chi_2_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("gauss_chi_2 result is ", gauss_chi_2_result, "\tspend time: ", (t_end-t_begin)*1000 / n_test_loops, "ms")
 
         t_begin = time.time()
-        gauss_leg_9_result = tester.gauss_leg_9(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2)
+        for i in range(0,n_test_loops):
+            gauss_leg_9_result = tester.gauss_leg_9(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2)
         t_end = time.time()
-        print("gauss_leg_9 result is ", gauss_leg_9_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("gauss_leg_9 result is ", gauss_leg_9_result, "\tspend time: ", (t_end-t_begin)*1000 / n_test_loops, "ms")
 
         t_begin = time.time()
-        comp_gauss_leg_result = tester.comp_gauss_leg(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2,-1.0,1.0)
+        for i in range(0,n_test_loops):
+            comp_gauss_leg_result = tester.comp_gauss_leg(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2,-1.0,1.0)
         t_end = time.time()
-        print("comp_gauss_leg result is ", comp_gauss_leg_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("comp_gauss_leg result is ", comp_gauss_leg_result, "\tspend time: ", (t_end-t_begin)*1000 / n_test_loops, "ms")
 
         t_begin = time.time()
-        comp_trep_result = tester.comp_trep(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2,-1.0,1.0)
+        for i in range(0,n_test_loops):
+            comp_trep_result = tester.comp_trep(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2,-1.0,1.0)
         t_end = time.time()
-        print("comp_trep result is ", comp_trep_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("comp_trep result is ", comp_trep_result, "\tspend time: ", (t_end-t_begin)*1000 / n_test_loops, "ms")
 
         t_begin = time.time()
-        romberg_result = tester.romberg(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2,-1.0,1.0)
+        for i in range(0,n_test_loops):
+            romberg_result = tester.romberg(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2,-1.0,1.0)
         t_end = time.time()
-        print("romberg rsult is ",romberg_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("romberg rsult is ",romberg_result, "\tspend time: ", (t_end-t_begin)*1000/ n_test_loops, "ms")
 
 
         print("#########################\n计算sin(x),在[0,pi/2]区间上的积分\n#######################")
 
-        t_begin = time.time()        
-        gauss_leg_9_result = tester.gauss_leg_9_common_range(normal_functions.sin_x,0.0,0.5*np.pi)
+        t_begin = time.time()   
+        for i in range(0,n_test_loops):     
+            gauss_leg_9_result = tester.gauss_leg_9_common_range(normal_functions.sin_x,0.0,0.5*np.pi)
         t_end = time.time()
-        print("gauss_leg_9 result is ", gauss_leg_9_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("gauss_leg_9 result is ", gauss_leg_9_result, "\tspend time: ", (t_end-t_begin)*1000 /n_test_loops, "ms")
 
         t_begin = time.time()
-        comp_gauss_leg_result = tester.comp_gauss_leg(normal_functions.sin_x,0.0,0.5*np.pi)
+        for i in range(0,n_test_loops):
+            comp_gauss_leg_result = tester.comp_gauss_leg(normal_functions.sin_x,0.0,0.5*np.pi)
         t_end = time.time()
-        print("comp_gauss_leg result is ", comp_gauss_leg_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("comp_gauss_leg result is ", comp_gauss_leg_result, "\tspend time: ", (t_end-t_begin)*1000 / n_test_loops, "ms")
 
         t_begin = time.time()
-        comp_trep_result = tester.comp_trep(normal_functions.sin_x,0.0,0.5*np.pi)
+        for i in range(0,n_test_loops):
+            comp_trep_result = tester.comp_trep(normal_functions.sin_x,0.0,0.5*np.pi)
         t_end = time.time()
-        print("comp_trep result is ", comp_trep_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("comp_trep result is ", comp_trep_result, "\tspend time: ", (t_end-t_begin)*1000 / n_test_loops, "ms")
 
         t_begin = time.time()
-        romberg_result = tester.romberg(normal_functions.sin_x,0.0,0.5*np.pi)
+        for i in range(0,n_test_loops):
+            romberg_result = tester.romberg(normal_functions.sin_x,0.0,0.5*np.pi)
         t_end = time.time()
-        print("romberg rsult is ",romberg_result, "\tspend time: ", (t_end-t_begin)*1000 , "ms")
+        print("romberg rsult is ",romberg_result, "\tspend time: ", (t_end-t_begin)*1000 / n_test_loops, "ms")
 
 
 if __name__ == "__main__":
@@ -432,4 +450,17 @@ if __name__ == "__main__":
     # result = s.romberg(normal_functions.sinx_divide_x,0.,1.)
     # print("result is ", result)
 
-    normal_functions.test_those_methods()
+    tmp_test = Integration()
+    tmp_test.verbose = True
+    # 细节,关于测试一
+    # comp_gauss_leg_result = tmp_test.comp_gauss_leg(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2,-1.0,1.0)
+    # tmp_test.comp_trep(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2,-1.0,1.0)
+    # tmp_test.romberg(normal_functions.exp_x_mul_sqrt_1_sub_x_pow_2,-1.0,1.0)
+
+    # 细节，关于测试二
+    # comp_gauss_leg_result = tmp_test.comp_gauss_leg(normal_functions.sin_x,0.0,0.5*np.pi)
+    # tmp_test.comp_trep(normal_functions.sin_x,0.0,0.5*np.pi)
+    # tmp_test.romberg(normal_functions.sin_x,0.0,0.5*np.pi)
+
+
+    normal_functions.test_those_methods(1)
