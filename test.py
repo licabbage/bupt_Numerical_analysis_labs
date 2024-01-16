@@ -38,3 +38,5 @@ if __name__ == "__main__":
     s = np.float32(0.125)
     print(struct.pack(">f",s))
 
+    
+
